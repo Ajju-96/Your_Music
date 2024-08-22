@@ -66,7 +66,7 @@ async function getSongs(folder) {
       palyMusic(e.querySelector(".info").firstElementChild.innerHTML.trim());
     });
   });
-  return "songs"
+  return ;
 
 }
 
