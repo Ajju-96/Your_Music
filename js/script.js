@@ -92,7 +92,7 @@ async function displayAlbums(){
   let array = Array.from(anchors)
     for (let index = 0; index < array.length; index++) {
       const e = array[index];
-    if(e.href.includes("/gaana/")){
+    if(e.href.includes("gaana/")){
       let folder = e.href.split("/").slice(-1)[0]
       // Get the metadata of the folder
       let a = await fetch(`http://127.0.0.1:5500/gaana/${folder}/info.json`);
