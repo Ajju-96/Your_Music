@@ -20,21 +20,23 @@ function secondsToMinutesSeconds(seconds) {
 }
 
 async function getSongs(folder) {
-  currFolder = folder;
-  let a = await fetch(`/${folder}/`);
-  let response = await a.text();
-  //   console.log(response);
-  let div = document.createElement("div");
-  div.innerHTML = response;
-  let as = div.getElementsByTagName("a");
+    let a = await fetch(`/${folder}/`);
+    console.log(`Fetching songs from: /${folder}/`);
+    let response = await a.text();
+    let div = document.createElement("div");
+    div.innerHTML = response;
+    let as = div.getElementsByTagName("a");
 
-  songs = [];
-  for (let index = 0; index < as.length; index++) {
-    const element = as[index];
-    if (element.href.endsWith(".mp3")) {
-      songs.push(element.href.split(`/${folder}/`)[1]);
+    songs = [];
+    for (let index = 0; index < as.length; index++) {
+        const element = as[index];
+        if (element.href.endsWith(".mp3")) {
+            songs.push(element.href.split(`/${folder}/`)[1]);
+        }
     }
-  }
+
+    // Additional code for displaying songs (if any)
+}
 
   
   // Show all the songs in the playlist
@@ -81,48 +83,45 @@ const palyMusic = (track, pause = false) => {
   
 };
 
-async function displayAlbums(){
-  let a = await fetch(`/gaana/`);
-  let response = await a.text();
-  //   console.log(response);
-  let div = document.createElement("div");
-  div.innerHTML = response;
-  let anchors = div.getElementsByTagName("a")
-  let cardcontainer = document.querySelector(".cardcontainer")
-  let array = Array.from(anchors)
+async function displayAlbums() {
+    let a = await fetch(`/gaana/`); 
+    console.log("Fetched albums list from: /gaana/"); 
+    let response = await a.text();
+    let div = document.createElement("div");
+    div.innerHTML = response;
+    let anchors = div.getElementsByTagName("a");
+    let cardcontainer = document.querySelector(".cardcontainer");
+    let array = Array.from(anchors);
+    
     for (let index = 0; index < array.length; index++) {
-      const e = array[index];
-    if(e.href.includes("/gaana/")){
-      let folder = e.href.split("/").slice(-1)[0]
-      // Get the metadata of the folder
-      let a = await fetch(`/gaana/${folder}/info.json`);
-      let response = await a.json();
-      cardcontainer.innerHTML = cardcontainer.innerHTML + `<div data-folder="${folder}" class="card ">
-                        <div class="play">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="black"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path d="M5 20V4L19 12L5 20Z" stroke="#141B34" stroke-width="1.5"
-                                    stroke-linejoin="round" />
-                            </svg>
-                        </div>
-
-                        <img src="/gaana/${folder}/cover.jpg" alt="">
-                        <h2>${response.title}</h2>
-                        <p>${response.description}</p>
-                    </div>`
+        const e = array[index];
+        if (e.href.includes("/gaana/")) {
+            let folder = e.href.split("/").slice(-1)[0];
+            console.log(`Fetching metadata from: /gaana/${folder}/info.json`); 
+            let a = await fetch(`/gaana/${folder}/info.json`);
+            let response = await a.json();
+            cardcontainer.innerHTML = cardcontainer.innerHTML + `<div data-folder="${folder}" class="card ">
+                <div class="play">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="black" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 20V4L19 12L5 20Z" stroke="#141B34" stroke-width="1.5" stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <img src="/gaana/${folder}/cover.jpg" alt="">
+                <h2>${response.title}</h2>
+                <p>${response.description}</p>
+            </div>`;
+        }
     }
-  } 
 
-  // Lode card whenever the card is clicked
-  Array.from(document.getElementsByClassName("card")).forEach(e=>{
-    e.addEventListener("click",async item=>{
-      songs = await getSongs(`gaana/${item.currentTarget.dataset.folder}`)
-      palyMusic(songs[0])
-    })
-  })
-  
+    Array.from(document.getElementsByClassName("card")).forEach(e => {
+        e.addEventListener("click", async item => {
+            console.log(`Card clicked: ${item.currentTarget.dataset.folder}`);
+            songs = await getSongs(`gaana/${item.currentTarget.dataset.folder}`);
+            console.log(`Playing first song: ${songs[0]}`);
+            palyMusic(songs[0]);
+        });
+    });
 }
-
 async function main() {
   // Get the list of all the songs
   await getSongs("gaana/ncs");
